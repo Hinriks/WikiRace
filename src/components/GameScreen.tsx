@@ -123,6 +123,17 @@ export function GameScreen({ puzzle, onEnd }: Props) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [loadArticle, start]);
 
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Backspace' && !(e.target instanceof HTMLInputElement) && !(e.target instanceof HTMLTextAreaElement)) {
+        e.preventDefault();
+        handleBack();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [handleBack]);
+
   const handleGiveUp = useCallback(() => {
     const time = timerStartedRef.current ? stop() : 0;
     setGameEnded(true);

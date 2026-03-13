@@ -20,22 +20,22 @@ function HowToPlayModal({ onClose }: { onClose: () => void }) {
         <h2 className={styles.modalTitle}>How to play</h2>
         <ol className={styles.rulesList}>
           <li>
-            <strong>Navigate Wikipedia</strong> from the start article to the target article by clicking links within the article text.
+            <span><strong>Navigate Wikipedia</strong> from the start article to the target article by clicking links within the article text.</span>
           </li>
           <li>
-            <strong>Fewer clicks is better.</strong> Time is a tiebreaker, but reaching the target efficiently is the real goal.
+            <span><strong>Fewer clicks is better.</strong> Time is a tiebreaker, but reaching the target efficiently is the real goal.</span>
           </li>
           <li>
-            <strong>Links are highlighted</strong> in blue — only internal Wikipedia article links are clickable. External links, references, and navigation boxes are disabled.
+            <span><strong>Links are highlighted</strong> in blue — only internal Wikipedia article links are clickable. External links, references, and navigation boxes are disabled.</span>
           </li>
           <li>
-            <strong>Going back</strong> still counts as a click, so choose wisely.
+            <span><strong>Going back</strong> still counts as a click, so choose wisely.</span>
           </li>
           <li>
-            <strong>Everyone gets the same puzzle</strong> each day. A new challenge drops at midnight UTC.
+            <span><strong>Everyone gets the same puzzle</strong> each day. A new challenge drops at midnight UTC.</span>
           </li>
           <li>
-            <strong>Share your result</strong> when you finish — without spoiling the path for others.
+            <span><strong>Share your result</strong> when you finish — without spoiling the path for others.</span>
           </li>
         </ol>
         <div className={styles.modalTip}>

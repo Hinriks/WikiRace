@@ -1,9 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { HomeScreen } from './components/HomeScreen';
 import { GameScreen } from './components/GameScreen';
 import { ResultsScreen } from './components/ResultsScreen';
+import { DevPanel } from './components/DevPanel';
 import { useTodaysPuzzle, getTodayUTC } from './hooks/useTodaysPuzzle';
 import { getStreak, updateStreak } from './hooks/useStreak';
+import { prefetchArticle } from './hooks/useWikiArticle';
 import type { Screen, GameResult } from './types';
 
 const STORAGE_KEY = 'wikirace_v1';
@@ -50,6 +52,13 @@ export default function App() {
     setScreen('result');
   }, []);
 
+  // Warm the article cache while the player is on the home screen
+  useEffect(() => {
+    if (puzzle && screen === 'home') {
+      prefetchArticle(puzzle.start_article);
+    }
+  }, [puzzle, screen]);
+
   if (loading) {
     return (
       <div className="app-loading">
@@ -70,17 +79,29 @@ export default function App() {
     );
   }
 
+  const devPanel = import.meta.env.DEV && (
+    <DevPanel
+      screen={screen}
+      setScreen={setScreen}
+      gameResult={gameResult}
+      setGameResult={setGameResult}
+      streak={streak}
+      setStreak={setStreak}
+      puzzle={puzzle}
+    />
+  );
+
   if (screen === 'home') {
-    return <HomeScreen puzzle={puzzle} onStart={handleStart} streak={streak} />;
+    return <>{<HomeScreen puzzle={puzzle} onStart={handleStart} streak={streak} />}{devPanel}</>;
   }
 
   if (screen === 'game') {
-    return <GameScreen puzzle={puzzle} onEnd={handleGameEnd} />;
+    return <><GameScreen puzzle={puzzle} onEnd={handleGameEnd} />{devPanel}</>;
   }
 
   if (screen === 'result' && gameResult) {
-    return <ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} />;
+    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} />{devPanel}</>;
   }
 
-  return null;
+  return <>{devPanel}</>;
 }
