@@ -6,7 +6,7 @@ A running list of potential features and improvements. Add your own ideas here.
 
 ## Quick wins (low effort, high value)
 
-- **Streak counter** — track how many days in a row the player has completed the puzzle. Show it on the home and results screens. Stored in localStorage. Proven retention mechanic.
+- ~~**Streak counter** — track how many days in a row the player has completed the puzzle. Show it on the home and results screens. Stored in localStorage. Proven retention mechanic.~~ ✓ Done
 - **Personal stats** — show the player their all-time history: games played, average clicks, best time, win rate. Stored in localStorage.
 - **Keyboard shortcut** — press `Backspace` to go back (instead of clicking the button)
 - **Prefetch start article** — load the start article in the background while the home screen is showing, so the game feels instant on Start
