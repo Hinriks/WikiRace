@@ -1,0 +1,59 @@
+---
+description: WikiRace coding conventions for React, TypeScript, and CSS
+globs: **/*.{ts,tsx,css}
+alwaysApply: false
+---
+
+# WikiRace Coding Conventions
+
+## TypeScript
+- Use `import type` for type-only imports (required by `verbatimModuleSyntax`)
+- Keep types in `src/types.ts` unless tightly scoped to one file
+- Prefer `useRef` for mutable game state that shouldn't trigger re-renders (clicks, path, timer start)
+- Pair refs with display state: `clicksRef` (mutable) + `setClicksDisplay` (visual)
+
+## React patterns
+- Functional components only, no class components
+- CSS Modules per component: `ComponentName.module.css` alongside `ComponentName.tsx`
+- Custom hooks in `src/hooks/` — one concern per hook
+- No router — screen switching via `type Screen = 'home' | 'game' | 'result'` in App.tsx
+- Stable callbacks: use refs inside `useEffect`/`useCallback` to avoid stale closures without adding to deps
+
+## State management
+- No Redux or Zustand — local state + refs + prop drilling is sufficient
+- Game session state lives in `GameScreen.tsx` (not App)
+- Persistence: `localStorage` keyed by UTC date string (`"2026-03-13"`)
+- Storage key: `wikirace_v1`
+
+## Supabase
+- Client is a singleton in `src/lib/supabase.ts`
+- Always check `import.meta.env.VITE_SUPABASE_URL` before making requests — fall back gracefully if not configured
+- Supabase writes (result submission) are fire-and-forget — never block the UI waiting for them
+- Check for placeholder value: `!url.includes('your_supabase')` before attempting requests
+
+## CSS
+- Global CSS variables in `src/index.css` — never hardcode colors or fonts in component CSS
+- Wikipedia article styles in `src/styles/article.css` — scoped to `.wiki-content`
+- Component styles in `ComponentName.module.css` — use CSS Modules, not inline styles
+- Animations defined in `index.css` as global keyframes, referenced from module CSS
+
+## Wikipedia API
+- Endpoint: `https://en.wikipedia.org/w/api.php`
+- Always include `origin=*` and `redirects=1` params
+- Use `parse.title` (not `displaytitle`) for canonical title comparison and win detection
+- Normalize titles: `decodeURIComponent(href).replace(/_/g, ' ')` before comparing
+- Link interception uses delegated events on the container — not per-link listeners
+
+## File structure
+```
+src/
+├── App.tsx
+├── types.ts
+├── main.tsx
+├── index.css
+├── lib/supabase.ts
+├── data/fallbackPuzzles.ts
+├── hooks/use*.ts
+├── components/*.tsx + *.module.css
+└── styles/article.css
+```

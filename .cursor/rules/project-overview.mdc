@@ -1,0 +1,33 @@
+---
+description: WikiRace project overview, concept, and goals
+alwaysApply: true
+---
+
+# WikiRace — Project Overview
+
+WikiRace is a daily Wikipedia link-racing game at **wikirace.io**.
+
+## Concept
+Players navigate from a start Wikipedia article to a target article by clicking internal Wikipedia links only. Every player gets the same start/end pair each day. Goal: reach the target in the fewest clicks.
+
+## Core principles
+- **No accounts, no friction** — players just open and play. No login, no name entry.
+- **Daily format** — one puzzle per day, resets at midnight UTC. Players can only play once per day (stored in localStorage).
+- **Share-first design** — the results screen is the most important screen. Make it satisfying to share.
+- **Offline-resilient** — the game must work even if Supabase is unreachable (fallback to hardcoded puzzles).
+
+## Tech stack
+- React + Vite + TypeScript
+- Supabase (daily_puzzles table + results table for anonymous analytics)
+- Wikipedia MediaWiki API (`https://en.wikipedia.org/w/api.php`)
+- canvas-confetti for win celebration
+- No router — screen state managed in App.tsx (`'home' | 'game' | 'result'`)
+- CSS Modules per component + global `index.css` variables
+
+## Key files
+- `src/App.tsx` — screen routing, localStorage persistence
+- `src/components/GameScreen.tsx` — core game: article rendering, link interception, timer, breadcrumbs
+- `src/components/ArticleView.tsx` — renders Wikipedia HTML, intercepts `/wiki/` links, strips clutter
+- `src/hooks/useTodaysPuzzle.ts` — fetches today's puzzle from Supabase by UTC date, falls back to `fallbackPuzzles.ts`
+- `src/hooks/useTimer.ts` — precise timer using `requestAnimationFrame` + `performance.now()`
+- `supabase/schema.sql` — full DB schema, RLS policies, seed data

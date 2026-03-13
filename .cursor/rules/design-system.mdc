@@ -1,0 +1,73 @@
+---
+description: WikiRace design system — colors, fonts, spacing, and UI conventions
+globs: **/*.{tsx,css}
+alwaysApply: false
+---
+
+# WikiRace Design System
+
+## Personality
+Clean, editorial, and energetic. Feels like a premium product, not a generic AI-generated app. Warm and inviting — players should feel happy visiting. Never: purple gradients, generic card stacks, or default system fonts.
+
+## Fonts (loaded via Google Fonts in index.css)
+- **Logo/brand**: `Bebas Neue` — used only for the "WikiRace" wordmark
+- **Article titles & challenge names**: `DM Serif Display` — serif, editorial, makes article names feel important
+- **All UI text**: `DM Sans` — clean, modern, readable
+
+```css
+font-family: var(--font-display);  /* Bebas Neue */
+font-family: var(--font-serif);    /* DM Serif Display */
+font-family: var(--font-sans);     /* DM Sans */
+```
+
+## Color palette (CSS variables in index.css)
+```css
+--bg: #F8F7F4           /* warm off-white — page background */
+--surface: #FFFFFF       /* cards, modals, article area */
+--surface-muted: #F3F2EF /* subtle backgrounds inside surfaces */
+--bar-bg: #18181B        /* game bar — near black */
+--bar-border: #2D2D31
+--text: #18181B
+--text-muted: #71717A
+--text-faint: #A1A1AA
+--accent: #D63E1F        /* warm red — CTAs, highlights */
+--accent-hover: #B83319
+--accent-light: #FEF0EC
+--link: #1D4ED8          /* Wikipedia-style blue for clickable links */
+--link-hover: #1E3FAD
+--border: #E4E4E7
+--border-strong: #D4D4D8
+--green: #16A34A         /* success / win state */
+--green-light: #DCFCE7
+```
+
+## Spacing & shape
+- Border radius: `--radius: 10px`, `--radius-sm: 6px`, `--radius-lg: 16px`
+- Max content width: **750px** (article), **860px** (game bar)
+- Shadows: `--shadow-sm`, `--shadow`, `--shadow-lg` — subtle, never heavy
+
+## UI conventions
+- Primary CTA buttons: `background: var(--accent)`, white text, `box-shadow` with red tint, hover lifts with `translateY(-1px)`
+- Secondary/ghost buttons: `border: 1px solid var(--border)`, muted text, no fill
+- Section labels: `0.7rem`, `700` weight, `0.12em` letter-spacing, uppercase, `var(--text-faint)` color
+- Modals/dialogs: `border-radius: var(--radius-lg)`, `box-shadow: var(--shadow-lg)`, fade+slide-down animation
+- Loading states: animated progress bar using `--accent`, never a full-page spinner blocking content
+- Error states: `#FEF2F2` background, `#FECACA` border, `#B91C1C` text
+
+## Animations
+Use these keyframes (defined in index.css):
+- `fadeIn` — opacity + translateY(8px), for screen transitions and modals
+- `slideDown` — for dropdowns and dialogs
+- `spin` — for the loading spinner
+- Keep transitions at `0.15s–0.2s ease` for snappiness
+
+## Responsive
+- Mobile-first thinking. Minimum touch target: 44px.
+- On mobile: infoboxes and floated images become block-level (handled in article.css)
+- Game bar stays sticky and readable at all widths
+
+## Don't do
+- Don't add new fonts without removing one — keep it to 3 families max
+- Don't use purple, blue gradients, or glassmorphism
+- Don't add heavy UI libraries (no Tailwind, no MUI, no Chakra)
+- Don't break the warm/editorial aesthetic with neon or overly playful elements
