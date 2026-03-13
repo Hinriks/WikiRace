@@ -8,6 +8,7 @@ import styles from './ResultsScreen.module.css';
 interface Props {
   puzzle: Puzzle;
   result: GameResult;
+  streak?: number;
 }
 
 function formatTime(seconds: number): string {
@@ -40,7 +41,7 @@ function buildShareText(puzzle: Puzzle, result: GameResult): string {
   return lines.join('\n');
 }
 
-export function ResultsScreen({ puzzle, result }: Props) {
+export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
   const [copied, setCopied] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const confettiFired = useRef(false);
@@ -133,6 +134,9 @@ export function ResultsScreen({ puzzle, result }: Props) {
                 <div className={styles.statusIcon}>✓</div>
                 <h1 className={styles.statusTitle}>You made it!</h1>
                 <p className={styles.statusSub}>Puzzle #{puzzleNum} complete</p>
+                {streak > 0 && (
+                  <div className={styles.streakPill}>{streak >= 3 && '🔥 '}{streak} day streak</div>
+                )}
               </>
             ) : (
               <>

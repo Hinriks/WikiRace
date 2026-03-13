@@ -7,6 +7,7 @@ interface Props {
   puzzle: Puzzle;
   onStart: () => void;
   alreadyPlayed?: boolean;
+  streak?: number;
 }
 
 function HowToPlayModal({ onClose }: { onClose: () => void }) {
@@ -45,7 +46,7 @@ function HowToPlayModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function HomeScreen({ puzzle, onStart, alreadyPlayed }: Props) {
+export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0 }: Props) {
   const [showHowTo, setShowHowTo] = useState(false);
   const puzzleNumber = getPuzzleNumber();
 
@@ -62,6 +63,12 @@ export function HomeScreen({ puzzle, onStart, alreadyPlayed }: Props) {
         <div className={styles.puzzleLabel}>
           Daily Puzzle #{puzzleNumber}
         </div>
+
+        {streak > 0 && (
+          <div className={styles.streak}>
+            {streak >= 3 && '🔥 '}{streak} day streak
+          </div>
+        )}
 
         <div className={styles.challenge}>
           <div className={styles.articleCard}>

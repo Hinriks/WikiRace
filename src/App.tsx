@@ -3,6 +3,7 @@ import { HomeScreen } from './components/HomeScreen';
 import { GameScreen } from './components/GameScreen';
 import { ResultsScreen } from './components/ResultsScreen';
 import { useTodaysPuzzle, getTodayUTC } from './hooks/useTodaysPuzzle';
+import { getStreak, updateStreak } from './hooks/useStreak';
 import type { Screen, GameResult } from './types';
 
 const STORAGE_KEY = 'wikirace_v1';
@@ -36,6 +37,7 @@ export default function App() {
 
   const [screen, setScreen] = useState<Screen>(storedResult ? 'result' : 'home');
   const [gameResult, setGameResult] = useState<GameResult | null>(storedResult);
+  const [streak, setStreak] = useState(() => getStreak());
 
   const handleStart = useCallback(() => {
     setScreen('game');
@@ -43,6 +45,7 @@ export default function App() {
 
   const handleGameEnd = useCallback((result: GameResult) => {
     storeResult(result);
+    setStreak(updateStreak(result.won));
     setGameResult(result);
     setScreen('result');
   }, []);
@@ -68,7 +71,7 @@ export default function App() {
   }
 
   if (screen === 'home') {
-    return <HomeScreen puzzle={puzzle} onStart={handleStart} />;
+    return <HomeScreen puzzle={puzzle} onStart={handleStart} streak={streak} />;
   }
 
   if (screen === 'game') {
@@ -76,7 +79,7 @@ export default function App() {
   }
 
   if (screen === 'result' && gameResult) {
-    return <ResultsScreen puzzle={puzzle} result={gameResult} />;
+    return <ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} />;
   }
 
   return null;

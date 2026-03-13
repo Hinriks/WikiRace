@@ -148,6 +148,18 @@
   color: var(--text-faint);
 }
 
+.streakPill {
+  margin-top: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid rgba(214, 62, 31, 0.2);
+  padding: 4px 14px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+
 /* ── Path ── */
 .pathSection {
   border-top: 1px solid var(--border);

@@ -58,7 +58,19 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-bottom: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.streak {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-light);
+  border: 1px solid rgba(214, 62, 31, 0.2);
+  padding: 4px 14px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.5rem;
 }
 
 .challenge {
