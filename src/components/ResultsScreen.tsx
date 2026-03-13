@@ -27,6 +27,7 @@ function formatShareTime(seconds: number): string {
 
 function buildShareText(puzzle: Puzzle, result: GameResult): string {
   const puzzleNum = getPuzzleNumber();
+  const siteUrl = window.location.origin;
   const lines = [
     `WikiRace #${puzzleNum}`,
     `${puzzle.start_article} → ${puzzle.end_article}`,
@@ -34,7 +35,7 @@ function buildShareText(puzzle: Puzzle, result: GameResult): string {
       ? `${result.clicks} click${result.clicks !== 1 ? 's' : ''} · ${formatShareTime(result.timeSeconds)}`
       : `Gave up after ${result.clicks} click${result.clicks !== 1 ? 's' : ''}`,
     ``,
-    `wikispeedrun.vercel.app`,
+    siteUrl,
   ];
   return lines.join('\n');
 }
