@@ -1,0 +1,9 @@
+.container {
+  padding: 0 0 2rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -1,0 +1,261 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  letter-spacing: 0.06em;
+  color: var(--text);
+  line-height: 1;
+}
+
+/* ── Main ── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+  max-width: 540px;
+  width: 100%;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* ── Status ── */
+.status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+}
+
+.statusIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--green);
+  color: white;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+}
+
+.statusIconGiveUp {
+  background: var(--text-faint);
+  box-shadow: none;
+}
+
+.statusTitle {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.statusSub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Route ── */
+.route {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  text-align: center;
+}
+
+.routeStart,
+.routeEnd {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: var(--text);
+}
+
+.routeArrow {
+  color: var(--text-faint);
+  font-size: 1rem;
+}
+
+/* ── Stats ── */
+.stats {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.statBox {
+  flex: 1;
+  max-width: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1rem;
+}
+
+.statNum {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ── Path ── */
+.pathSection {
+  border-top: 1px solid var(--border);
+  padding-top: 1.5rem;
+}
+
+.pathLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 0.75rem;
+}
+
+.path {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+  align-items: center;
+  line-height: 1.6;
+}
+
+.pathItem {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.pathSep {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+  margin: 0 0.15rem;
+}
+
+.pathNode {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.pathFinal {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--green);
+}
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  background: var(--accent);
+  padding: 14px 24px;
+  border-radius: var(--radius);
+  width: 100%;
+  transition: background 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 2px 8px rgba(214, 62, 31, 0.3);
+}
+
+.shareBtn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.shareBtn:active {
+  transform: translateY(0);
+}
+
+.shareIcon {
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+/* ── Come back ── */
+.comeback {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 540px) {
+  .card {
+    padding: 1.75rem 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .statusTitle {
+    font-size: 1.5rem;
+  }
+
+  .statNum {
+    font-size: 1.65rem;
+  }
+}
