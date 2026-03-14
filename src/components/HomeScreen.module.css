@@ -61,6 +61,15 @@
   margin-bottom: 0.75rem;
 }
 
+.customLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--link);
+  margin-bottom: 0.75rem;
+}
+
 .streak {
   font-size: 0.8rem;
   font-weight: 600;
@@ -146,6 +155,24 @@
   box-shadow: 0 2px 6px rgba(214, 62, 31, 0.3);
 }
 
+.createChallengeLink {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-strong);
+  transition: color 0.15s;
+}
+
+.createChallengeLink:hover {
+  color: var(--text);
+}
+
 .alreadyPlayed {
   font-size: 0.95rem;
   color: var(--text-muted);
@@ -169,13 +196,21 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 1rem;
   animation: fadeIn 0.15s ease;
+}
+
+.overlayClose {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  cursor: default;
+  padding: 0;
 }
 
 .modal {
@@ -189,6 +224,7 @@
   box-shadow: var(--shadow-lg);
   position: relative;
   animation: slideDown 0.2s ease;
+  z-index: 1;
 }
 
 .modalClose {

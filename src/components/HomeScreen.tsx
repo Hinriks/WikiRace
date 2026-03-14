@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Puzzle } from '../types';
 import { getPuzzleNumber } from '../hooks/useTodaysPuzzle';
+import { CreateChallengeModal } from './CreateChallengeModal';
 import styles from './HomeScreen.module.css';
 
 interface Props {
@@ -8,13 +9,15 @@ interface Props {
   onStart: () => void;
   alreadyPlayed?: boolean;
   streak?: number;
+  isCustom?: boolean;
 }
 
 function HowToPlayModal({ onClose }: { onClose: () => void }) {
   return (
-    <div className={styles.overlay} onClick={onClose}>
-      <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <button className={styles.modalClose} onClick={onClose} aria-label="Close">
+    <div className={styles.overlay}>
+      <button type="button" className={styles.overlayClose} onClick={onClose} aria-label="Close modal" />
+      <div className={styles.modal} role="dialog" aria-label="How to play">
+        <button type="button" className={styles.modalClose} onClick={onClose} aria-label="Close">
           ✕
         </button>
         <h2 className={styles.modalTitle}>How to play</h2>
@@ -46,25 +49,26 @@ function HowToPlayModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0 }: Props) {
+export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0, isCustom = false }: Props) {
   const [showHowTo, setShowHowTo] = useState(false);
+  const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const puzzleNumber = getPuzzleNumber();
 
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
         <div className={styles.logo}>WikiRace</div>
-        <button className={styles.howToBtn} onClick={() => setShowHowTo(true)}>
+        <button type="button" className={styles.howToBtn} onClick={() => setShowHowTo(true)}>
           How to play
         </button>
       </header>
 
       <main className={styles.main}>
-        <div className={styles.puzzleLabel}>
-          Daily Puzzle #{puzzleNumber}
+        <div className={isCustom ? styles.customLabel : styles.puzzleLabel}>
+          {isCustom ? 'Custom Challenge' : `Daily Puzzle #${puzzleNumber}`}
         </div>
 
-        {streak > 0 && (
+        {!isCustom && streak > 0 && (
           <div className={styles.streak}>
             {streak >= 3 && '🔥 '}{streak} day streak
           </div>
@@ -90,25 +94,38 @@ export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0 }: Props
         </div>
 
         <p className={styles.subtitle}>
-          Navigate Wikipedia links to reach the target in as few clicks as possible.
+          {isCustom
+            ? 'A friend challenged you to this route. Navigate Wikipedia links to reach the target in as few clicks as possible.'
+            : 'Navigate Wikipedia links to reach the target in as few clicks as possible.'}
         </p>
 
-        {alreadyPlayed ? (
+        {!isCustom && alreadyPlayed ? (
           <div className={styles.alreadyPlayed}>
             You've already played today's puzzle. Come back tomorrow!
           </div>
         ) : (
-          <button className={styles.startBtn} onClick={onStart}>
-            Start Playing
+          <button type="button" className={styles.startBtn} onClick={onStart}>
+            {isCustom ? 'Accept Challenge' : 'Start Playing'}
           </button>
         )}
+
+        <button
+          type="button"
+          className={styles.createChallengeLink}
+          onClick={() => setShowCreateChallenge(true)}
+        >
+          Create custom challenge
+        </button>
       </main>
 
-      <footer className={styles.footer}>
-        A new puzzle every day at midnight UTC
-      </footer>
+      {!isCustom && (
+        <footer className={styles.footer}>
+          A new puzzle every day at midnight UTC
+        </footer>
+      )}
 
       {showHowTo && <HowToPlayModal onClose={() => setShowHowTo(false)} />}
+      {showCreateChallenge && <CreateChallengeModal onClose={() => setShowCreateChallenge(false)} />}
     </div>
   );
 }

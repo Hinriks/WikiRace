@@ -3,12 +3,14 @@ import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabase';
 import type { Puzzle, GameResult } from '../types';
 import { getPuzzleNumber, getTodayUTC } from '../hooks/useTodaysPuzzle';
+import { CreateChallengeModal } from './CreateChallengeModal';
 import styles from './ResultsScreen.module.css';
 
 interface Props {
   puzzle: Puzzle;
   result: GameResult;
   streak?: number;
+  isCustom?: boolean;
 }
 
 function formatTime(seconds: number): string {
@@ -26,11 +28,15 @@ function formatShareTime(seconds: number): string {
   return `0:${String(s).padStart(2, '0')}`;
 }
 
-function buildShareText(puzzle: Puzzle, result: GameResult): string {
-  const puzzleNum = getPuzzleNumber();
-  const siteUrl = window.location.origin;
+function buildChallengeUrl(puzzle: Puzzle): string {
+  return `${window.location.origin}?from=${encodeURIComponent(puzzle.start_article)}&to=${encodeURIComponent(puzzle.end_article)}`;
+}
+
+function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean): string {
+  const siteUrl = isCustom ? buildChallengeUrl(puzzle) : window.location.origin;
+  const header = isCustom ? 'WikiRace Custom Challenge' : `WikiRace #${getPuzzleNumber()}`;
   const lines = [
-    `WikiRace #${puzzleNum}`,
+    header,
     `${puzzle.start_article} → ${puzzle.end_article}`,
     result.won
       ? `${result.clicks} click${result.clicks !== 1 ? 's' : ''} · ${formatShareTime(result.timeSeconds)}`
@@ -41,12 +47,14 @@ function buildShareText(puzzle: Puzzle, result: GameResult): string {
   return lines.join('\n');
 }
 
-export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
+export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false }: Props) {
   const [copied, setCopied] = useState(false);
+  const [copiedChallenge, setCopiedChallenge] = useState(false);
+  const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const confettiFired = useRef(false);
 
-  // Fire confetti and submit to Supabase on mount
+  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally runs once on mount only
   useEffect(() => {
     if (result.won && !confettiFired.current) {
       confettiFired.current = true;
@@ -95,26 +103,31 @@ export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
         });
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleShare = async () => {
-    const text = buildShareText(puzzle, result);
+  async function copyToClipboard(text: string) {
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Fallback for browsers without clipboard API
       const textarea = document.createElement('textarea');
       textarea.value = text;
       document.body.appendChild(textarea);
       textarea.select();
       document.execCommand('copy');
       document.body.removeChild(textarea);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
     }
+  }
+
+  const handleShare = async () => {
+    await copyToClipboard(buildShareText(puzzle, result, isCustom));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleShareChallenge = async () => {
+    await copyToClipboard(buildChallengeUrl(puzzle));
+    setCopiedChallenge(true);
+    setTimeout(() => setCopiedChallenge(false), 2500);
   };
 
   const puzzleNum = getPuzzleNumber();
@@ -133,8 +146,10 @@ export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
               <>
                 <div className={styles.statusIcon}>✓</div>
                 <h1 className={styles.statusTitle}>You made it!</h1>
-                <p className={styles.statusSub}>Puzzle #{puzzleNum} complete</p>
-                {streak > 0 && (
+                <p className={styles.statusSub}>
+                  {isCustom ? 'Custom challenge complete' : `Puzzle #${puzzleNum} complete`}
+                </p>
+                {!isCustom && streak > 0 && (
                   <div className={styles.streakPill}>{streak >= 3 && '🔥 '}{streak} day streak</div>
                 )}
               </>
@@ -142,7 +157,9 @@ export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
               <>
                 <div className={`${styles.statusIcon} ${styles.statusIconGiveUp}`}>✕</div>
                 <h1 className={styles.statusTitle}>Better luck next time</h1>
-                <p className={styles.statusSub}>Puzzle #{puzzleNum} — you gave up</p>
+                <p className={styles.statusSub}>
+                  {isCustom ? 'Custom challenge — you gave up' : `Puzzle #${puzzleNum} — you gave up`}
+                </p>
               </>
             )}
           </div>
@@ -171,6 +188,7 @@ export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
             <div className={styles.pathLabel}>Your path</div>
             <div className={styles.path}>
               {result.path.map((title, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: path steps can repeat the same article
                 <span key={i} className={styles.pathItem}>
                   {i > 0 && <span className={styles.pathSep}>→</span>}
                   <span className={i === result.path.length - 1 && result.won ? styles.pathFinal : styles.pathNode}>
@@ -183,7 +201,7 @@ export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
 
           {/* Actions */}
           <div className={styles.actions}>
-            <button className={styles.shareBtn} onClick={handleShare}>
+            <button type="button" className={styles.shareBtn} onClick={handleShare}>
               {copied ? (
                 <>
                   <span className={styles.shareIcon}>✓</span>
@@ -196,13 +214,32 @@ export function ResultsScreen({ puzzle, result, streak = 0 }: Props) {
                 </>
               )}
             </button>
+            {isCustom && (
+              <button type="button" className={styles.shareThisBtn} onClick={handleShareChallenge}>
+                {copiedChallenge ? (
+                  <><span className={styles.shareIcon}>✓</span> Link copied!</>
+                ) : (
+                  <><span className={styles.shareIcon}>⚑</span> Share this challenge</>
+                )}
+              </button>
+            )}
+            <button type="button" className={styles.challengeBtn} onClick={() => setShowCreateChallenge(true)}>
+              <span className={styles.shareIcon}>+</span>
+              Create custom challenge
+            </button>
           </div>
         </div>
 
-        <p className={styles.comeback}>
-          Come back tomorrow for a new puzzle.
-        </p>
+        {!isCustom && (
+          <p className={styles.comeback}>
+            Come back tomorrow for a new puzzle.
+          </p>
+        )}
       </main>
+
+      {showCreateChallenge && (
+        <CreateChallengeModal onClose={() => setShowCreateChallenge(false)} />
+      )}
     </div>
   );
 }

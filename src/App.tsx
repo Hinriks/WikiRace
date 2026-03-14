@@ -6,9 +6,18 @@ import { DevPanel } from './components/DevPanel';
 import { useTodaysPuzzle, getTodayUTC } from './hooks/useTodaysPuzzle';
 import { getStreak, updateStreak } from './hooks/useStreak';
 import { prefetchArticle } from './hooks/useWikiArticle';
-import type { Screen, GameResult } from './types';
+import type { Screen, GameResult, Puzzle } from './types';
 
 const STORAGE_KEY = 'wikirace_v1';
+
+// Parse ?from=X&to=Y once at load time — null when not a custom challenge
+const _urlParams = new URLSearchParams(window.location.search);
+const _f = _urlParams.get('from')?.trim() || null;
+const _t = _urlParams.get('to')?.trim() || null;
+const CUSTOM_PUZZLE: Puzzle | null = (_f && _t)
+  ? { id: 0, date: '', start_article: _f, end_article: _t }
+  : null;
+const IS_CUSTOM = CUSTOM_PUZZLE !== null;
 
 function getStoredResult(): GameResult | null {
   try {
@@ -34,11 +43,20 @@ function storeResult(result: GameResult) {
 }
 
 export default function App() {
-  const { puzzle, loading } = useTodaysPuzzle();
-  const storedResult = getStoredResult();
+  const { puzzle: dailyPuzzle, loading: dailyLoading } = useTodaysPuzzle();
 
-  const [screen, setScreen] = useState<Screen>(storedResult ? 'result' : 'home');
-  const [gameResult, setGameResult] = useState<GameResult | null>(storedResult);
+  // For custom challenges, build the puzzle immediately from URL params
+  const puzzle: Puzzle | null = CUSTOM_PUZZLE ?? dailyPuzzle;
+  const loading = IS_CUSTOM ? false : dailyLoading;
+
+  const [screen, setScreen] = useState<Screen>(() => {
+    if (IS_CUSTOM) return 'home';
+    const stored = getStoredResult();
+    return stored ? 'result' : 'home';
+  });
+  const [gameResult, setGameResult] = useState<GameResult | null>(() =>
+    IS_CUSTOM ? null : getStoredResult()
+  );
   const [streak, setStreak] = useState(() => getStreak());
 
   const handleStart = useCallback(() => {
@@ -46,8 +64,10 @@ export default function App() {
   }, []);
 
   const handleGameEnd = useCallback((result: GameResult) => {
-    storeResult(result);
-    setStreak(updateStreak(result.won));
+    if (!IS_CUSTOM) {
+      storeResult(result);
+      setStreak(updateStreak(result.won));
+    }
     setGameResult(result);
     setScreen('result');
   }, []);
@@ -92,7 +112,7 @@ export default function App() {
   );
 
   if (screen === 'home') {
-    return <>{<HomeScreen puzzle={puzzle} onStart={handleStart} streak={streak} />}{devPanel}</>;
+    return <>{<HomeScreen puzzle={puzzle} onStart={handleStart} streak={streak} isCustom={IS_CUSTOM} />}{devPanel}</>;
   }
 
   if (screen === 'game') {
@@ -100,7 +120,7 @@ export default function App() {
   }
 
   if (screen === 'result' && gameResult) {
-    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} />{devPanel}</>;
+    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} isCustom={IS_CUSTOM} />{devPanel}</>;
   }
 
   return <>{devPanel}</>;

@@ -238,6 +238,57 @@
   transform: translateY(0);
 }
 
+.shareThisBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--link);
+  background: #eff6ff;
+  padding: 13px 24px;
+  border-radius: var(--radius);
+  width: 100%;
+  border: 1.5px solid var(--link);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.shareThisBtn:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.shareThisBtn:active {
+  transform: translateY(0);
+}
+
+.challengeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  padding: 13px 24px;
+  border-radius: var(--radius);
+  width: 100%;
+  border: 1.5px solid var(--border-strong);
+  transition: background 0.15s ease, transform 0.1s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.challengeBtn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+  transform: translateY(-1px);
+}
+
+.challengeBtn:active {
+  transform: translateY(0);
+}
+
 .shareIcon {
   font-size: 1rem;
   opacity: 0.85;
