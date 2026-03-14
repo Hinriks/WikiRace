@@ -302,6 +302,24 @@
   text-align: center;
 }
 
+/* ── Ko-fi ── */
+.kofi {
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.kofi a {
+  color: var(--text-faint);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.kofi a:hover {
+  color: var(--text-muted);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }

@@ -235,6 +235,17 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false }: 
             Come back tomorrow for a new puzzle.
           </p>
         )}
+
+        <p className={styles.kofi}>
+          Enjoying WikiRace?{' '}
+          <a
+            href="https://ko-fi.com/hinriks"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Support on Ko-fi
+          </a>
+        </p>
       </main>
 
       {showCreateChallenge && (

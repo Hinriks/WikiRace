@@ -1,9 +1,55 @@
 import { useState, useCallback } from 'react';
 import type { Screen, GameResult, Puzzle } from '../types';
+import type { PlayerStats } from '../hooks/useStats';
 import { getTodayUTC } from '../hooks/useTodaysPuzzle';
 import styles from './DevPanel.module.css';
 
 const STORAGE_KEY = 'wikirace_v1';
+const STATS_KEY = 'wikirace_stats_v1';
+
+const STAT_PRESETS: { label: string; stats: PlayerStats }[] = [
+  {
+    label: 'Empty',
+    stats: { gamesPlayed: 0, wins: 0, totalWinClicks: 0, bestClicks: null, bestTime: null, recentGames: [] },
+  },
+  {
+    label: 'Casual',
+    stats: {
+      gamesPlayed: 5, wins: 3, totalWinClicks: 21, bestClicks: 5, bestTime: 68.4,
+      recentGames: [
+        { date: '2026-03-14', start: 'Pizza', end: 'Samurai', clicks: 5, timeSeconds: 68.4, won: true },
+        { date: '2026-03-13', start: 'Eiffel Tower', end: 'Genghis Khan', clicks: 8, timeSeconds: 112.1, won: true },
+        { date: '2026-03-12', start: 'Beethoven', end: 'Black hole', clicks: 3, timeSeconds: 187.0, won: false },
+      ],
+    },
+  },
+  {
+    label: 'Regular',
+    stats: {
+      gamesPlayed: 18, wins: 13, totalWinClicks: 78, bestClicks: 3, bestTime: 31.2,
+      recentGames: [
+        { date: '2026-03-14', start: 'Pizza', end: 'Samurai', clicks: 3, timeSeconds: 31.2, won: true },
+        { date: '2026-03-13', start: 'Eiffel Tower', end: 'Genghis Khan', clicks: 5, timeSeconds: 54.7, won: true },
+        { date: '2026-03-12', start: 'Beethoven', end: 'Black hole', clicks: 7, timeSeconds: 93.0, won: true },
+        { date: '2026-03-11', start: 'Napoleon', end: 'Internet', clicks: 4, timeSeconds: 47.8, won: false },
+        { date: '2026-03-10', start: 'Cleopatra', end: 'Telephone', clicks: 6, timeSeconds: 71.3, won: true },
+      ],
+    },
+  },
+  {
+    label: 'Veteran',
+    stats: {
+      gamesPlayed: 52, wins: 47, totalWinClicks: 188, bestClicks: 2, bestTime: 14.8,
+      recentGames: [
+        { date: '2026-03-14', start: 'Pizza', end: 'Samurai', clicks: 2, timeSeconds: 14.8, won: true },
+        { date: '2026-03-13', start: 'Eiffel Tower', end: 'Genghis Khan', clicks: 3, timeSeconds: 22.1, won: true },
+        { date: '2026-03-12', start: 'Beethoven', end: 'Black hole', clicks: 4, timeSeconds: 38.5, won: true },
+        { date: '2026-03-11', start: 'Napoleon', end: 'Internet', clicks: 2, timeSeconds: 19.3, won: true },
+        { date: '2026-03-10', start: 'Cleopatra', end: 'Telephone', clicks: 3, timeSeconds: 27.6, won: true },
+      ],
+    },
+  },
+];
 
 interface Props {
   screen: Screen;
@@ -99,6 +145,12 @@ export function DevPanel({ screen, setScreen, gameResult, setGameResult, streak,
     } catch {}
   }, [streakInput, setStreak]);
 
+  const applyStatPreset = useCallback((stats: PlayerStats) => {
+    try {
+      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    } catch {}
+  }, []);
+
   const saveStorage = useCallback(() => {
     try {
       const parsed = JSON.parse(storageRaw);
@@ -169,6 +221,24 @@ export function DevPanel({ screen, setScreen, gameResult, setGameResult, streak,
                 <button type="button" className={styles.chip} onClick={() => setMockResult(true)}>Mock win</button>
                 <button type="button" className={styles.chip} onClick={() => setMockResult(false)}>Mock loss</button>
               </div>
+            </section>
+
+            {/* Stats presets */}
+            <section className={styles.section}>
+              <div className={styles.sectionLabel}>Stats presets</div>
+              <div className={styles.chipRow}>
+                {STAT_PRESETS.map(({ label, stats }) => (
+                  <button
+                    type="button"
+                    key={label}
+                    className={styles.chip}
+                    onClick={() => applyStatPreset(stats)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.hint}>Open the Stats modal on home screen to preview</div>
             </section>
 
             {/* Streak */}

@@ -160,7 +160,9 @@ export function GameScreen({ puzzle, onEnd }: Props) {
 
           <div className={styles.barStats}>
             <div className={styles.stat}>
-              <span className={styles.statValue}>{clicksDisplay}</span>
+              <span key={clicksDisplay} className={clicksDisplay > 0 ? styles.statValueBump : styles.statValue}>
+                {clicksDisplay}
+              </span>
               <span className={styles.statLabel}>clicks</span>
             </div>
             <div className={styles.statDivider} />

@@ -23,7 +23,14 @@
   line-height: 1;
 }
 
-.howToBtn {
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.howToBtn,
+.statsBtn {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-muted);
@@ -34,7 +41,8 @@
   transition: all 0.15s ease;
 }
 
-.howToBtn:hover {
+.howToBtn:hover,
+.statsBtn:hover {
   color: var(--text);
   border-color: var(--border-strong);
   background: var(--surface-muted);
@@ -185,11 +193,30 @@
 
 /* ── Footer ── */
 .footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
   text-align: center;
   padding: 1.25rem;
   font-size: 0.8rem;
   color: var(--text-faint);
   border-top: 1px solid var(--border);
+}
+
+.footerDot {
+  opacity: 0.5;
+}
+
+.kofiLink {
+  color: var(--text-faint);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.kofiLink:hover {
+  color: var(--text-muted);
 }
 
 /* ── Modal ── */
@@ -298,6 +325,122 @@
   font-size: 0.875rem;
   color: var(--text-muted);
   line-height: 1.5;
+}
+
+/* ── Stats modal ── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.statCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1rem;
+}
+
+.statNum {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.bestTime {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.statsEmpty {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1rem 0;
+  line-height: 1.5;
+}
+
+/* ── Recent games ── */
+.recentSection {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recentLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.recentList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.recentRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.recentRow:last-child {
+  border-bottom: none;
+}
+
+.recentRoute {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.recentArrow {
+  color: var(--text-faint);
+  font-size: 0.75rem;
+}
+
+.recentResult {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.recentClicks {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.recentGaveUp {
+  color: var(--text-faint);
+  font-style: italic;
 }
 
 @keyframes fadeIn {

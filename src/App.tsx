@@ -5,6 +5,7 @@ import { ResultsScreen } from './components/ResultsScreen';
 import { DevPanel } from './components/DevPanel';
 import { useTodaysPuzzle, getTodayUTC } from './hooks/useTodaysPuzzle';
 import { getStreak, updateStreak } from './hooks/useStreak';
+import { updateStats } from './hooks/useStats';
 import { prefetchArticle } from './hooks/useWikiArticle';
 import type { Screen, GameResult, Puzzle } from './types';
 
@@ -67,10 +68,11 @@ export default function App() {
     if (!IS_CUSTOM) {
       storeResult(result);
       setStreak(updateStreak(result.won));
+      updateStats(result, puzzle);
     }
     setGameResult(result);
     setScreen('result');
-  }, []);
+  }, [puzzle]);
 
   // Warm the article cache while the player is on the home screen
   useEffect(() => {

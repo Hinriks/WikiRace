@@ -7,16 +7,16 @@ A running list of potential features and improvements. Add your own ideas here.
 ## Quick wins (low effort, high value)
 
 - ~~**Streak counter** — track how many days in a row the player has completed the puzzle. Show it on the home and results screens. Stored in localStorage. Proven retention mechanic.~~ ✓ Done
-- **Personal stats** — show the player their all-time history: games played, average clicks, best time, win rate. Stored in localStorage.
+- ~~**Personal stats** — show the player their all-time history: games played, average clicks, best time, win rate. Stored in localStorage.~~ ✓ Done
 - ~~**Keyboard shortcut** — press `Backspace` to go back (instead of clicking the button)~~ ✓ Done
 - ~~**Prefetch start article** — load the start article in the background while the home screen is showing, so the game feels instant on Start~~ ✓ Done
-- **Animated click counter** — subtle bump animation on the click count each time it increments
+- ~~**Animated click counter** — subtle bump animation on the click count each time it increments~~ ✓ Done
 
 ---
 
 ## Medium effort
 
-- **Custom challenge links** — generate a URL like `wikirace.io/?from=Pizza&to=Samurai` so players can challenge friends to beat their score on a custom puzzle
+- ~~**Custom challenge links** — generate a URL like `wikirace.io/?from=Pizza&to=Samurai` so players can challenge friends to beat their score on a custom puzzle~~
 - **Hard mode** — toggle that disables the back button, or adds a click limit / time limit
 - **Hints system** — reveal one step in a known solution path at the cost of +3 click penalty
 - **Puzzle archive** — browse and replay past daily puzzles (after they've passed)
@@ -36,7 +36,7 @@ A running list of potential features and improvements. Add your own ideas here.
 
 ## Monetisation ideas
 
-- **Ko-fi / Buy Me a Coffee** — "Support WikiRace" link in the footer
+- ~~**Ko-fi / Buy Me a Coffee** — "Support WikiRace" link in the footer~~ ✓ Done
 - **Carbon Ads or EthicalAds** — minimal, text-only ads on the home or results screen only (never in the game)
 - **Sponsored puzzles** — a brand pays for a themed puzzle once a week
 - **WikiRace Pro** — paid tier with: unlimited replays, full stats history, custom challenge links, no ads
