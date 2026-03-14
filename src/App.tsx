@@ -68,7 +68,7 @@ export default function App() {
     if (!IS_CUSTOM) {
       storeResult(result);
       setStreak(updateStreak(result.won));
-      updateStats(result, puzzle);
+      if (puzzle) updateStats(result, puzzle);
     }
     setGameResult(result);
     setScreen('result');
