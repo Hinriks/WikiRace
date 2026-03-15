@@ -11,6 +11,7 @@ interface Props {
   result: GameResult;
   streak?: number;
   isCustom?: boolean;
+  source?: string;
 }
 
 function formatTime(seconds: number): string {
@@ -47,7 +48,7 @@ function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean): 
   return lines.join('\n');
 }
 
-export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false }: Props) {
+export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, source }: Props) {
   const [copied, setCopied] = useState(false);
   const [copiedChallenge, setCopiedChallenge] = useState(false);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
@@ -98,9 +99,8 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false }: 
           clicks: result.clicks,
           time_seconds: parseFloat(result.timeSeconds.toFixed(2)),
           path: result.path,
-        }).then(() => {
-          // Silent — we don't show submission status to the user
-        });
+          source: source ?? null,
+        }).then(() => {});
       }
     }
   }, []);
@@ -118,16 +118,49 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false }: 
     }
   }
 
+  function logShareEvent() {
+    const hasConfig =
+      import.meta.env.VITE_SUPABASE_URL &&
+      import.meta.env.VITE_SUPABASE_ANON_KEY &&
+      !import.meta.env.VITE_SUPABASE_URL.includes('your_supabase');
+    if (hasConfig) {
+      supabase.from('share_events').insert({
+        puzzle_date: getTodayUTC(),
+        is_custom: isCustom,
+      }).then(() => {});
+    }
+  }
+
   const handleShare = async () => {
-    await copyToClipboard(buildShareText(puzzle, result, isCustom));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+    const text = buildShareText(puzzle, result, isCustom);
+    logShareEvent();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'WikiRace', text });
+      } catch {
+        // User cancelled or share failed — no feedback needed
+      }
+    } else {
+      await copyToClipboard(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
   };
 
   const handleShareChallenge = async () => {
-    await copyToClipboard(buildChallengeUrl(puzzle));
-    setCopiedChallenge(true);
-    setTimeout(() => setCopiedChallenge(false), 2500);
+    const url = buildChallengeUrl(puzzle);
+    logShareEvent();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'WikiRace Challenge', url });
+      } catch {
+        // User cancelled or share failed — no feedback needed
+      }
+    } else {
+      await copyToClipboard(url);
+      setCopiedChallenge(true);
+      setTimeout(() => setCopiedChallenge(false), 2500);
+    }
   };
 
   const puzzleNum = getPuzzleNumber();

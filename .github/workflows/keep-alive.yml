@@ -1,0 +1,31 @@
+name: Keep Supabase Alive
+
+on:
+  schedule:
+    # Runs every 5 days at 10:00 UTC — well within the 7-day pause threshold
+    - cron: '0 10 */5 * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/daily_puzzles?select=date&order=date.desc&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+
+          echo "Supabase ping status: $STATUS"
+
+          if [ "$STATUS" != "200" ]; then
+            echo "Unexpected status code $STATUS — Supabase may be paused or unreachable." >&2
+            exit 1
+          fi
+
+          echo "Supabase is alive."
