@@ -213,6 +213,12 @@
   gap: 0.75rem;
 }
 
+.shareRow {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
 .shareBtn {
   display: flex;
   align-items: center;
@@ -224,7 +230,7 @@
   background: var(--accent);
   padding: 14px 24px;
   border-radius: var(--radius);
-  width: 100%;
+  flex: 1;
   transition: background 0.15s ease, transform 0.1s ease;
   box-shadow: 0 2px 8px rgba(214, 62, 31, 0.3);
 }
@@ -235,6 +241,50 @@
 }
 
 .shareBtn:active {
+  transform: translateY(0);
+}
+
+.nativeShareBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: white;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 2px 8px rgba(214, 62, 31, 0.3);
+}
+
+.nativeShareBtn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.nativeShareBtn:active {
+  transform: translateY(0);
+}
+
+.nativeShareBtnOutline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border-radius: var(--radius);
+  background: #eff6ff;
+  color: var(--link);
+  border: 1.5px solid var(--link);
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.nativeShareBtnOutline:hover {
+  background: #dbeafe;
+  transform: translateY(-1px);
+}
+
+.nativeShareBtnOutline:active {
   transform: translateY(0);
 }
 

@@ -134,32 +134,36 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
   const handleShare = async () => {
     const text = buildShareText(puzzle, result, isCustom);
     logShareEvent();
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'WikiRace', text });
-      } catch {
-        // User cancelled or share failed — no feedback needed
-      }
-    } else {
-      await copyToClipboard(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+    await copyToClipboard(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleNativeShare = async () => {
+    const text = buildShareText(puzzle, result, isCustom);
+    logShareEvent();
+    try {
+      await navigator.share({ title: 'WikiRace', text });
+    } catch {
+      // User cancelled or share failed — no feedback needed
     }
   };
 
   const handleShareChallenge = async () => {
     const url = buildChallengeUrl(puzzle);
     logShareEvent();
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'WikiRace Challenge', url });
-      } catch {
-        // User cancelled or share failed — no feedback needed
-      }
-    } else {
-      await copyToClipboard(url);
-      setCopiedChallenge(true);
-      setTimeout(() => setCopiedChallenge(false), 2500);
+    await copyToClipboard(url);
+    setCopiedChallenge(true);
+    setTimeout(() => setCopiedChallenge(false), 2500);
+  };
+
+  const handleNativeShareChallenge = async () => {
+    const url = buildChallengeUrl(puzzle);
+    logShareEvent();
+    try {
+      await navigator.share({ title: 'WikiRace Challenge', url });
+    } catch {
+      // User cancelled or share failed — no feedback needed
     }
   };
 
@@ -234,27 +238,43 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
 
           {/* Actions */}
           <div className={styles.actions}>
-            <button type="button" className={styles.shareBtn} onClick={handleShare}>
-              {copied ? (
-                <>
-                  <span className={styles.shareIcon}>✓</span>
-                  Copied to clipboard!
-                </>
-              ) : (
-                <>
-                  <span className={styles.shareIcon}>⬡</span>
-                  Share result
-                </>
-              )}
-            </button>
-            {isCustom && (
-              <button type="button" className={styles.shareThisBtn} onClick={handleShareChallenge}>
-                {copiedChallenge ? (
-                  <><span className={styles.shareIcon}>✓</span> Link copied!</>
+            <div className={styles.shareRow}>
+              <button type="button" className={styles.shareBtn} onClick={handleShare}>
+                {copied ? (
+                  <><span className={styles.shareIcon}>✓</span> Copied!</>
                 ) : (
-                  <><span className={styles.shareIcon}>⚑</span> Share this challenge</>
+                  <><span className={styles.shareIcon}>⬡</span> Share result</>
                 )}
               </button>
+              {navigator.share && (
+                <button type="button" className={styles.nativeShareBtn} onClick={handleNativeShare} title="Share via...">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                    <polyline points="16 6 12 2 8 6" />
+                    <line x1="12" y1="2" x2="12" y2="15" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {isCustom && (
+              <div className={styles.shareRow}>
+                <button type="button" className={styles.shareThisBtn} onClick={handleShareChallenge}>
+                  {copiedChallenge ? (
+                    <><span className={styles.shareIcon}>✓</span> Link copied!</>
+                  ) : (
+                    <><span className={styles.shareIcon}>⚑</span> Share this challenge</>
+                  )}
+                </button>
+                {navigator.share && (
+                  <button type="button" className={styles.nativeShareBtnOutline} onClick={handleNativeShareChallenge} title="Share via...">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                      <polyline points="16 6 12 2 8 6" />
+                      <line x1="12" y1="2" x2="12" y2="15" />
+                    </svg>
+                  </button>
+                )}
+              </div>
             )}
             <button type="button" className={styles.challengeBtn} onClick={() => setShowCreateChallenge(true)}>
               <span className={styles.shareIcon}>+</span>
