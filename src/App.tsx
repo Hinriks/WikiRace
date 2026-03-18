@@ -15,6 +15,7 @@ const STORAGE_KEY = 'wikirace_v1';
 const _urlParams = new URLSearchParams(window.location.search);
 const _f = _urlParams.get('from')?.trim() || null;
 const _t = _urlParams.get('to')?.trim() || null;
+const UTM_SOURCE = _urlParams.get('utm_source')?.trim() || undefined;
 const CUSTOM_PUZZLE: Puzzle | null = (_f && _t)
   ? { id: 0, date: '', start_article: _f, end_article: _t }
   : null;
@@ -68,7 +69,7 @@ export default function App() {
     if (!IS_CUSTOM) {
       storeResult(result);
       setStreak(updateStreak(result.won));
-      updateStats(result, puzzle);
+      if (puzzle) updateStats(result, puzzle);
     }
     setGameResult(result);
     setScreen('result');
@@ -122,7 +123,7 @@ export default function App() {
   }
 
   if (screen === 'result' && gameResult) {
-    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} isCustom={IS_CUSTOM} />{devPanel}</>;
+    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} isCustom={IS_CUSTOM} source={UTM_SOURCE} />{devPanel}</>;
   }
 
   return <>{devPanel}</>;

@@ -1,0 +1,28 @@
+name: Generate Daily Puzzles
+
+on:
+  schedule:
+    # Runs at 09:00 UTC on the 1st of every month
+    - cron: '0 9 1 * *'
+  workflow_dispatch:
+    inputs:
+      days_ahead:
+        description: 'How many days of puzzles to generate (default: 45)'
+        required: false
+        default: '45'
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Generate and insert puzzles
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DAYS_AHEAD: ${{ github.event.inputs.days_ahead || '45' }}
+        run: python3 .github/scripts/generate_puzzles.py

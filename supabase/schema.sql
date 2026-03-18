@@ -18,7 +18,18 @@ create table if not exists results (
   clicks integer not null,
   time_seconds numeric(10, 2) not null,
   path text[] not null,
+  source text,
   submitted_at timestamptz default now()
+);
+
+-- If the results table already exists, run this to add the source column:
+-- alter table results add column if not exists source text;
+
+create table if not exists share_events (
+  id uuid primary key default gen_random_uuid(),
+  puzzle_date date not null,
+  is_custom boolean not null default false,
+  shared_at timestamptz default now()
 );
 
 -- ============================================================
@@ -41,6 +52,13 @@ create policy "public insert results"
 create policy "public read results"
   on results for select
   using (true);
+
+-- share_events: public insert only
+alter table share_events enable row level security;
+
+create policy "public insert share_events"
+  on share_events for insert
+  with check (true);
 
 -- ============================================================
 -- SEED DATA — 60 daily puzzles starting 2026-03-13
