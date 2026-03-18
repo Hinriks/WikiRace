@@ -9,10 +9,27 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   padding: 1.25rem 2rem;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
+}
+
+.statsBtn {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition: all 0.15s ease;
+}
+
+.statsBtn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-muted);
 }
 
 .logo {
@@ -21,6 +38,12 @@
   letter-spacing: 0.06em;
   color: var(--text);
   line-height: 1;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.logo:hover {
+  opacity: 0.7;
 }
 
 /* ── Main ── */
@@ -313,6 +336,31 @@
   transform: translateY(0);
 }
 
+.playAgainBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: white;
+  background: var(--green);
+  padding: 14px 24px;
+  border-radius: var(--radius);
+  width: 100%;
+  transition: filter 0.15s ease, transform 0.1s ease;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+}
+
+.playAgainBtn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.playAgainBtn:active {
+  transform: translateY(0);
+}
+
 .challengeBtn {
   display: flex;
   align-items: center;
@@ -352,6 +400,32 @@
   text-align: center;
 }
 
+/* ── Follow prompt ── */
+.followPrompt {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.comeback + .followPrompt {
+  margin-top: 0.35rem;
+}
+
+.followLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-faint);
+  text-decoration: none;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.followLink:hover {
+  color: var(--text-muted);
+  text-decoration: underline;
+}
+
 /* ── Ko-fi ── */
 .kofi {
   margin-top: 0.6rem;
@@ -368,6 +442,62 @@
 
 .kofi a:hover {
   color: var(--text-muted);
+}
+
+.communitySection {
+  width: 100%;
+}
+
+.communityDivider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.communityDivider::before,
+.communityDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.communityLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.communityBtns {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.communityBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.communityBtn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--surface-muted);
 }
 
 @keyframes fadeIn {

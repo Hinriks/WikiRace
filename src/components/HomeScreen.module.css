@@ -219,6 +219,23 @@
   color: var(--text-muted);
 }
 
+.socialLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  color: var(--text-faint);
+  transition: color 0.15s ease;
+}
+
+.socialLink:hover {
+  color: var(--text-muted);
+}
+
 /* ── Modal ── */
 .overlay {
   position: fixed;

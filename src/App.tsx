@@ -75,6 +75,11 @@ export default function App() {
     setScreen('result');
   }, [puzzle]);
 
+  const handlePlayAgain = useCallback(() => {
+    setGameResult(null);
+    setScreen('home');
+  }, []);
+
   // Warm the article cache while the player is on the home screen
   useEffect(() => {
     if (puzzle && screen === 'home') {
@@ -123,7 +128,7 @@ export default function App() {
   }
 
   if (screen === 'result' && gameResult) {
-    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} isCustom={IS_CUSTOM} source={UTM_SOURCE} />{devPanel}</>;
+    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} isCustom={IS_CUSTOM} source={UTM_SOURCE} onPlayAgain={IS_CUSTOM ? handlePlayAgain : undefined} />{devPanel}</>;
   }
 
   return <>{devPanel}</>;
