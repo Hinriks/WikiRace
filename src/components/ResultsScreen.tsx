@@ -3,7 +3,9 @@ import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabase';
 import type { Puzzle, GameResult } from '../types';
 import { getPuzzleNumber, getTodayUTC } from '../hooks/useTodaysPuzzle';
+import { useDailyStats } from '../hooks/useDailyStats';
 import { CreateChallengeModal } from './CreateChallengeModal';
+import { StatsModal } from './StatsModal';
 import styles from './ResultsScreen.module.css';
 
 interface Props {
@@ -11,7 +13,10 @@ interface Props {
   result: GameResult;
   streak?: number;
   isCustom?: boolean;
+  isRandom?: boolean;
   source?: string;
+  onPlayAgain?: () => void;
+  onPlayAnotherRandom?: () => void;
 }
 
 function formatTime(seconds: number): string {
@@ -33,9 +38,9 @@ function buildChallengeUrl(puzzle: Puzzle): string {
   return `${window.location.origin}?from=${encodeURIComponent(puzzle.start_article)}&to=${encodeURIComponent(puzzle.end_article)}`;
 }
 
-function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean): string {
+function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean, isRandom: boolean): string {
   const siteUrl = isCustom ? buildChallengeUrl(puzzle) : window.location.origin;
-  const header = isCustom ? 'WikiRace Custom Challenge' : `WikiRace #${getPuzzleNumber()}`;
+  const header = isCustom ? 'WikiRace Custom Challenge' : isRandom ? 'WikiRace Random Challenge' : `WikiRace #${getPuzzleNumber()}`;
   const lines = [
     header,
     `${puzzle.start_article} → ${puzzle.end_article}`,
@@ -48,12 +53,15 @@ function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean): 
   return lines.join('\n');
 }
 
-export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, source }: Props) {
+export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, isRandom = false, source, onPlayAgain, onPlayAnotherRandom }: Props) {
   const [copied, setCopied] = useState(false);
   const [copiedChallenge, setCopiedChallenge] = useState(false);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [showDailyAvg, setShowDailyAvg] = useState(false);
   const confettiFired = useRef(false);
+  const submitted = useRef(false);
+  const dailyStats = useDailyStats(getTodayUTC(), !isCustom && !isRandom);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally runs once on mount only
   useEffect(() => {
@@ -86,8 +94,8 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
     }
 
     // Submit result to Supabase (fire and forget)
-    if (result.won && !submitted) {
-      setSubmitted(true);
+    if (result.won && !submitted.current) {
+      submitted.current = true;
       const hasConfig =
         import.meta.env.VITE_SUPABASE_URL &&
         import.meta.env.VITE_SUPABASE_ANON_KEY &&
@@ -132,7 +140,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
   }
 
   const handleShare = async () => {
-    const text = buildShareText(puzzle, result, isCustom);
+    const text = buildShareText(puzzle, result, isCustom, isRandom);
     logShareEvent();
     await copyToClipboard(text);
     setCopied(true);
@@ -140,7 +148,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
   };
 
   const handleNativeShare = async () => {
-    const text = buildShareText(puzzle, result, isCustom);
+    const text = buildShareText(puzzle, result, isCustom, isRandom);
     logShareEvent();
     try {
       await navigator.share({ title: 'WikiRace', text });
@@ -172,7 +180,12 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
-        <div className={styles.logo}>WikiRace</div>
+        <a href={window.location.origin} className={styles.logo}>WikiRace</a>
+        {!isCustom && !isRandom && (
+          <button type="button" className={styles.statsBtn} onClick={() => setShowStats(true)}>
+            Stats
+          </button>
+        )}
       </header>
 
       <main className={styles.main}>
@@ -184,9 +197,9 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
                 <div className={styles.statusIcon}>✓</div>
                 <h1 className={styles.statusTitle}>You made it!</h1>
                 <p className={styles.statusSub}>
-                  {isCustom ? 'Custom challenge complete' : `Puzzle #${puzzleNum} complete`}
+                  {isRandom ? 'Random challenge complete' : isCustom ? 'Custom challenge complete' : `Puzzle #${puzzleNum} complete`}
                 </p>
-                {!isCustom && streak > 0 && (
+                {!isCustom && !isRandom && streak > 0 && (
                   <div className={styles.streakPill}>{streak >= 3 && '🔥 '}{streak} day streak</div>
                 )}
               </>
@@ -195,7 +208,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
                 <div className={`${styles.statusIcon} ${styles.statusIconGiveUp}`}>✕</div>
                 <h1 className={styles.statusTitle}>Better luck next time</h1>
                 <p className={styles.statusSub}>
-                  {isCustom ? 'Custom challenge — you gave up' : `Puzzle #${puzzleNum} — you gave up`}
+                  {isRandom ? 'Random challenge — you gave up' : isCustom ? 'Custom challenge — you gave up' : `Puzzle #${puzzleNum} — you gave up`}
                 </p>
               </>
             )}
@@ -219,6 +232,31 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
               <span className={styles.statLabel}>time</span>
             </div>
           </div>
+
+          {dailyStats && dailyStats.count >= 2 && (
+            <div className={styles.dailyAvgRow}>
+              {showDailyAvg ? (
+                <div className={styles.dailyAvgReveal}>
+                  <div className={styles.dailyAvgStat}>
+                    <span className={styles.dailyAvgNum}>{dailyStats.avgClicks}</span>
+                    <span className={styles.dailyAvgLabel}>avg clicks</span>
+                  </div>
+                  <div className={styles.dailyAvgDivider} />
+                  <div className={styles.dailyAvgStat}>
+                    <span className={styles.dailyAvgNum}>{formatTime(dailyStats.avgTime)}</span>
+                    <span className={styles.dailyAvgLabel}>avg time</span>
+                  </div>
+                  <button type="button" className={styles.dailyAvgClose} onClick={() => setShowDailyAvg(false)} aria-label="Hide">
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button type="button" className={styles.dailyAvgToggle} onClick={() => setShowDailyAvg(true)}>
+                  View daily average
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Path taken */}
           <div className={styles.pathSection}>
@@ -256,6 +294,33 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
                 </button>
               )}
             </div>
+            {isCustom && onPlayAgain && (
+              <button type="button" className={styles.playAgainBtn} onClick={onPlayAgain}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                Play again
+              </button>
+            )}
+            {isRandom && onPlayAnotherRandom && (
+              <button type="button" className={styles.playAgainBtn} onClick={onPlayAnotherRandom}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                Play another random
+              </button>
+            )}
+            {!isCustom && !isRandom && onPlayAnotherRandom && (
+              <button type="button" className={styles.challengeBtn} onClick={onPlayAnotherRandom}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                Play a random challenge
+              </button>
+            )}
             {isCustom && (
               <div className={styles.shareRow}>
                 <button type="button" className={styles.shareThisBtn} onClick={handleShareChallenge}>
@@ -281,13 +346,35 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
               Create custom challenge
             </button>
           </div>
+
+          <div className={styles.communitySection}>
+            <div className={styles.communityDivider}>
+              <span className={styles.communityLabel}>Join the community</span>
+            </div>
+            <div className={styles.communityBtns}>
+              <a href="https://x.com/WikiRaceDaily" className={styles.communityBtn} target="_blank" rel="noopener noreferrer">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                @WikiRaceDaily
+              </a>
+              <a href="https://www.reddit.com/r/WikiRaceio" className={styles.communityBtn} target="_blank" rel="noopener noreferrer">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/></svg>
+                r/WikiRaceio
+              </a>
+            </div>
+          </div>
         </div>
 
-        {!isCustom && (
+        {!isCustom && !isRandom && (
           <p className={styles.comeback}>
             Come back tomorrow for a new puzzle.
           </p>
         )}
+        <p className={styles.followPrompt}>
+          <a href="https://x.com/WikiRaceDaily" target="_blank" rel="noopener noreferrer" className={styles.followLink}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            Follow @WikiRaceDaily for daily puzzle reminders
+          </a>
+        </p>
 
         <p className={styles.kofi}>
           Enjoying WikiRace?{' '}
@@ -303,6 +390,9 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
 
       {showCreateChallenge && (
         <CreateChallengeModal onClose={() => setShowCreateChallenge(false)} />
+      )}
+      {showStats && (
+        <StatsModal onClose={() => setShowStats(false)} />
       )}
     </div>
   );

@@ -54,5 +54,5 @@ A running list of potential features and improvements. Add your own ideas here.
 
 ## Your ideas
 
-<!-- Add your own ideas below -->
+- **Create a WikiRace subreddit (r/WikiRace)** — a dedicated community for sharing daily results, paths, strategies, and feedback. Gives players a home base beyond the game itself. Could become a self-sustaining source of word-of-mouth growth as players share scores and discuss routes.
 
