@@ -183,6 +183,82 @@
   letter-spacing: 0.04em;
 }
 
+/* ── Daily average reveal ── */
+.dailyAvgRow {
+  display: flex;
+  justify-content: center;
+}
+
+.dailyAvgToggle {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-strong);
+  padding: 0;
+  transition: color 0.15s ease;
+}
+
+.dailyAvgToggle:hover {
+  color: var(--text-muted);
+}
+
+.dailyAvgReveal {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.875rem;
+  position: relative;
+}
+
+.dailyAvgStat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+}
+
+.dailyAvgNum {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.dailyAvgLabel {
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.dailyAvgDivider {
+  width: 1px;
+  height: 1rem;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.dailyAvgClose {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 0.25rem;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.dailyAvgClose:hover {
+  color: var(--text-muted);
+}
+
 /* ── Path ── */
 .pathSection {
   border-top: 1px solid var(--border);

@@ -7,6 +7,7 @@ import { useTodaysPuzzle, getTodayUTC } from './hooks/useTodaysPuzzle';
 import { getStreak, updateStreak } from './hooks/useStreak';
 import { updateStats } from './hooks/useStats';
 import { prefetchArticle } from './hooks/useWikiArticle';
+import { useRandomPuzzle } from './hooks/useRandomPuzzle';
 import type { Screen, GameResult, Puzzle } from './types';
 
 const STORAGE_KEY = 'wikirace_v1';
@@ -46,9 +47,13 @@ function storeResult(result: GameResult) {
 
 export default function App() {
   const { puzzle: dailyPuzzle, loading: dailyLoading } = useTodaysPuzzle();
+  const { fetchRandomPuzzle, randomLoading } = useRandomPuzzle();
 
   // For custom challenges, build the puzzle immediately from URL params
-  const puzzle: Puzzle | null = CUSTOM_PUZZLE ?? dailyPuzzle;
+  const [randomPuzzle, setRandomPuzzle] = useState<Puzzle | null>(null);
+  const IS_RANDOM = randomPuzzle !== null;
+
+  const puzzle: Puzzle | null = randomPuzzle ?? CUSTOM_PUZZLE ?? dailyPuzzle;
   const loading = IS_CUSTOM ? false : dailyLoading;
 
   const [screen, setScreen] = useState<Screen>(() => {
@@ -66,19 +71,42 @@ export default function App() {
   }, []);
 
   const handleGameEnd = useCallback((result: GameResult) => {
-    if (!IS_CUSTOM) {
+    if (!IS_CUSTOM && !IS_RANDOM) {
       storeResult(result);
       setStreak(updateStreak(result.won));
       if (puzzle) updateStats(result, puzzle);
     }
     setGameResult(result);
     setScreen('result');
-  }, [puzzle]);
+  }, [puzzle, IS_RANDOM]);
 
   const handlePlayAgain = useCallback(() => {
     setGameResult(null);
     setScreen('home');
   }, []);
+
+  const handleBackToDaily = useCallback(() => {
+    if (IS_CUSTOM) {
+      // Strip URL params and reload to get back to the daily puzzle
+      window.location.href = window.location.origin;
+    } else {
+      // Random challenge — just reset state
+      setRandomPuzzle(null);
+      setGameResult(null);
+      setScreen('home');
+    }
+  }, []);
+
+  const handleRandomChallenge = useCallback(async () => {
+    try {
+      const p = await fetchRandomPuzzle();
+      setRandomPuzzle(p);
+      setGameResult(null);
+      setScreen('home');
+    } catch {
+      alert('Couldn\'t find a random puzzle right now. Please try again.');
+    }
+  }, [fetchRandomPuzzle]);
 
   // Warm the article cache while the player is on the home screen
   useEffect(() => {
@@ -120,7 +148,7 @@ export default function App() {
   );
 
   if (screen === 'home') {
-    return <>{<HomeScreen puzzle={puzzle} onStart={handleStart} streak={streak} isCustom={IS_CUSTOM} />}{devPanel}</>;
+    return <>{<HomeScreen puzzle={puzzle} onStart={handleStart} streak={streak} isCustom={IS_CUSTOM} isRandom={IS_RANDOM} onRandomChallenge={handleRandomChallenge} randomLoading={randomLoading} onBackToDaily={(IS_CUSTOM || IS_RANDOM) ? handleBackToDaily : undefined} />}{devPanel}</>;
   }
 
   if (screen === 'game') {
@@ -128,7 +156,7 @@ export default function App() {
   }
 
   if (screen === 'result' && gameResult) {
-    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} isCustom={IS_CUSTOM} source={UTM_SOURCE} onPlayAgain={IS_CUSTOM ? handlePlayAgain : undefined} />{devPanel}</>;
+    return <><ResultsScreen puzzle={puzzle} result={gameResult} streak={streak} isCustom={IS_CUSTOM} isRandom={IS_RANDOM} source={UTM_SOURCE} onPlayAgain={IS_CUSTOM ? handlePlayAgain : undefined} onPlayAnotherRandom={IS_RANDOM || !IS_CUSTOM ? handleRandomChallenge : undefined} />{devPanel}</>;
   }
 
   return <>{devPanel}</>;

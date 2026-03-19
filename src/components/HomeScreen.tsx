@@ -8,9 +8,12 @@ import styles from './HomeScreen.module.css';
 interface Props {
   puzzle: Puzzle;
   onStart: () => void;
-  alreadyPlayed?: boolean;
   streak?: number;
   isCustom?: boolean;
+  isRandom?: boolean;
+  onRandomChallenge?: () => void;
+  randomLoading?: boolean;
+  onBackToDaily?: () => void;
 }
 
 
@@ -51,7 +54,7 @@ function HowToPlayModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0, isCustom = false }: Props) {
+export function HomeScreen({ puzzle, onStart, streak = 0, isCustom = false, isRandom = false, onRandomChallenge, randomLoading = false, onBackToDaily }: Props) {
   const [showStats, setShowStats] = useState(false);
   const [showHowTo, setShowHowTo] = useState(false);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
@@ -60,9 +63,19 @@ export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0, isCusto
   return (
     <div className={styles.wrapper}>
       <header className={styles.header}>
-        <div className={styles.logo}>WikiRace</div>
+        {(isCustom || isRandom) && onBackToDaily ? (
+          <button type="button" className={styles.backBtn} onClick={onBackToDaily}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5" />
+              <path d="M12 19l-7-7 7-7" />
+            </svg>
+            Back to daily puzzle
+          </button>
+        ) : (
+          <div className={styles.logo}>WikiRace</div>
+        )}
         <div className={styles.headerActions}>
-          {!isCustom && (
+          {!isCustom && !isRandom && (
             <button type="button" className={styles.statsBtn} onClick={() => setShowStats(true)}>
               Stats
             </button>
@@ -74,11 +87,11 @@ export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0, isCusto
       </header>
 
       <main className={styles.main}>
-        <div className={isCustom ? styles.customLabel : styles.puzzleLabel}>
-          {isCustom ? 'Custom Challenge' : `Daily Puzzle #${puzzleNumber}`}
+        <div className={isRandom ? styles.randomLabel : isCustom ? styles.customLabel : styles.puzzleLabel}>
+          {isRandom ? 'Random Challenge' : isCustom ? 'Custom Challenge' : `Daily Puzzle #${puzzleNumber}`}
         </div>
 
-        {!isCustom && streak > 0 && (
+        {!isCustom && !isRandom && streak > 0 && (
           <div className={styles.streak}>
             {streak >= 3 && '🔥 '}{streak} day streak
           </div>
@@ -104,18 +117,46 @@ export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0, isCusto
         </div>
 
         <p className={styles.subtitle}>
-          {isCustom
-            ? 'A friend challenged you to this route. Navigate Wikipedia links to reach the target in as few clicks as possible.'
-            : 'Navigate Wikipedia links to reach the target in as few clicks as possible.'}
+          Navigate Wikipedia links to reach the target in as few clicks as possible.
         </p>
 
-        {!isCustom && alreadyPlayed ? (
-          <div className={styles.alreadyPlayed}>
-            You've already played today's puzzle. Come back tomorrow!
-          </div>
-        ) : (
-          <button type="button" className={styles.startBtn} onClick={onStart}>
-            {isCustom ? 'Accept Challenge' : 'Start Playing'}
+        <button type="button" className={styles.startBtn} onClick={onStart}>
+          {isCustom ? 'Accept Challenge' : isRandom ? 'Start Random' : 'Start Playing'}
+        </button>
+
+        {isRandom && onRandomChallenge && (
+          <button
+            type="button"
+            className={styles.randomChallengeLink}
+            onClick={onRandomChallenge}
+            disabled={randomLoading}
+          >
+            {randomLoading ? (
+              <>
+                <span className={styles.randomSpinner} aria-hidden="true" />
+                Finding another…
+              </>
+            ) : (
+              'Try a different one'
+            )}
+          </button>
+        )}
+
+        {!isCustom && !isRandom && onRandomChallenge && (
+          <button
+            type="button"
+            className={styles.randomChallengeLink}
+            onClick={onRandomChallenge}
+            disabled={randomLoading}
+          >
+            {randomLoading ? (
+              <>
+                <span className={styles.randomSpinner} aria-hidden="true" />
+                Finding a random puzzle…
+              </>
+            ) : (
+              'Random challenge'
+            )}
           </button>
         )}
 
@@ -128,7 +169,7 @@ export function HomeScreen({ puzzle, onStart, alreadyPlayed, streak = 0, isCusto
         </button>
       </main>
 
-      {!isCustom && (
+      {!isCustom && !isRandom && (
         <footer className={styles.footer}>
           A new puzzle every day at midnight UTC
           <span className={styles.footerDot}>·</span>

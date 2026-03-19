@@ -3,6 +3,7 @@ import confetti from 'canvas-confetti';
 import { supabase } from '../lib/supabase';
 import type { Puzzle, GameResult } from '../types';
 import { getPuzzleNumber, getTodayUTC } from '../hooks/useTodaysPuzzle';
+import { useDailyStats } from '../hooks/useDailyStats';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { StatsModal } from './StatsModal';
 import styles from './ResultsScreen.module.css';
@@ -12,8 +13,10 @@ interface Props {
   result: GameResult;
   streak?: number;
   isCustom?: boolean;
+  isRandom?: boolean;
   source?: string;
   onPlayAgain?: () => void;
+  onPlayAnotherRandom?: () => void;
 }
 
 function formatTime(seconds: number): string {
@@ -35,9 +38,9 @@ function buildChallengeUrl(puzzle: Puzzle): string {
   return `${window.location.origin}?from=${encodeURIComponent(puzzle.start_article)}&to=${encodeURIComponent(puzzle.end_article)}`;
 }
 
-function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean): string {
+function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean, isRandom: boolean): string {
   const siteUrl = isCustom ? buildChallengeUrl(puzzle) : window.location.origin;
-  const header = isCustom ? 'WikiRace Custom Challenge' : `WikiRace #${getPuzzleNumber()}`;
+  const header = isCustom ? 'WikiRace Custom Challenge' : isRandom ? 'WikiRace Random Challenge' : `WikiRace #${getPuzzleNumber()}`;
   const lines = [
     header,
     `${puzzle.start_article} → ${puzzle.end_article}`,
@@ -50,13 +53,15 @@ function buildShareText(puzzle: Puzzle, result: GameResult, isCustom: boolean): 
   return lines.join('\n');
 }
 
-export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, source, onPlayAgain }: Props) {
+export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, isRandom = false, source, onPlayAgain, onPlayAnotherRandom }: Props) {
   const [copied, setCopied] = useState(false);
   const [copiedChallenge, setCopiedChallenge] = useState(false);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+  const [showDailyAvg, setShowDailyAvg] = useState(false);
   const confettiFired = useRef(false);
+  const submitted = useRef(false);
+  const dailyStats = useDailyStats(getTodayUTC(), !isCustom && !isRandom);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally runs once on mount only
   useEffect(() => {
@@ -89,8 +94,8 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
     }
 
     // Submit result to Supabase (fire and forget)
-    if (result.won && !submitted) {
-      setSubmitted(true);
+    if (result.won && !submitted.current) {
+      submitted.current = true;
       const hasConfig =
         import.meta.env.VITE_SUPABASE_URL &&
         import.meta.env.VITE_SUPABASE_ANON_KEY &&
@@ -135,7 +140,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
   }
 
   const handleShare = async () => {
-    const text = buildShareText(puzzle, result, isCustom);
+    const text = buildShareText(puzzle, result, isCustom, isRandom);
     logShareEvent();
     await copyToClipboard(text);
     setCopied(true);
@@ -143,7 +148,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
   };
 
   const handleNativeShare = async () => {
-    const text = buildShareText(puzzle, result, isCustom);
+    const text = buildShareText(puzzle, result, isCustom, isRandom);
     logShareEvent();
     try {
       await navigator.share({ title: 'WikiRace', text });
@@ -176,7 +181,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
     <div className={styles.wrapper}>
       <header className={styles.header}>
         <a href={window.location.origin} className={styles.logo}>WikiRace</a>
-        {!isCustom && (
+        {!isCustom && !isRandom && (
           <button type="button" className={styles.statsBtn} onClick={() => setShowStats(true)}>
             Stats
           </button>
@@ -192,9 +197,9 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
                 <div className={styles.statusIcon}>✓</div>
                 <h1 className={styles.statusTitle}>You made it!</h1>
                 <p className={styles.statusSub}>
-                  {isCustom ? 'Custom challenge complete' : `Puzzle #${puzzleNum} complete`}
+                  {isRandom ? 'Random challenge complete' : isCustom ? 'Custom challenge complete' : `Puzzle #${puzzleNum} complete`}
                 </p>
-                {!isCustom && streak > 0 && (
+                {!isCustom && !isRandom && streak > 0 && (
                   <div className={styles.streakPill}>{streak >= 3 && '🔥 '}{streak} day streak</div>
                 )}
               </>
@@ -203,7 +208,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
                 <div className={`${styles.statusIcon} ${styles.statusIconGiveUp}`}>✕</div>
                 <h1 className={styles.statusTitle}>Better luck next time</h1>
                 <p className={styles.statusSub}>
-                  {isCustom ? 'Custom challenge — you gave up' : `Puzzle #${puzzleNum} — you gave up`}
+                  {isRandom ? 'Random challenge — you gave up' : isCustom ? 'Custom challenge — you gave up' : `Puzzle #${puzzleNum} — you gave up`}
                 </p>
               </>
             )}
@@ -227,6 +232,31 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
               <span className={styles.statLabel}>time</span>
             </div>
           </div>
+
+          {dailyStats && dailyStats.count >= 2 && (
+            <div className={styles.dailyAvgRow}>
+              {showDailyAvg ? (
+                <div className={styles.dailyAvgReveal}>
+                  <div className={styles.dailyAvgStat}>
+                    <span className={styles.dailyAvgNum}>{dailyStats.avgClicks}</span>
+                    <span className={styles.dailyAvgLabel}>avg clicks</span>
+                  </div>
+                  <div className={styles.dailyAvgDivider} />
+                  <div className={styles.dailyAvgStat}>
+                    <span className={styles.dailyAvgNum}>{formatTime(dailyStats.avgTime)}</span>
+                    <span className={styles.dailyAvgLabel}>avg time</span>
+                  </div>
+                  <button type="button" className={styles.dailyAvgClose} onClick={() => setShowDailyAvg(false)} aria-label="Hide">
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button type="button" className={styles.dailyAvgToggle} onClick={() => setShowDailyAvg(true)}>
+                  View daily average
+                </button>
+              )}
+            </div>
+          )}
 
           {/* Path taken */}
           <div className={styles.pathSection}>
@@ -273,6 +303,24 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
                 Play again
               </button>
             )}
+            {isRandom && onPlayAnotherRandom && (
+              <button type="button" className={styles.playAgainBtn} onClick={onPlayAnotherRandom}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                Play another random
+              </button>
+            )}
+            {!isCustom && !isRandom && onPlayAnotherRandom && (
+              <button type="button" className={styles.challengeBtn} onClick={onPlayAnotherRandom}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                  <path d="M3 3v5h5" />
+                </svg>
+                Play a random challenge
+              </button>
+            )}
             {isCustom && (
               <div className={styles.shareRow}>
                 <button type="button" className={styles.shareThisBtn} onClick={handleShareChallenge}>
@@ -316,7 +364,7 @@ export function ResultsScreen({ puzzle, result, streak = 0, isCustom = false, so
           </div>
         </div>
 
-        {!isCustom && (
+        {!isCustom && !isRandom && (
           <p className={styles.comeback}>
             Come back tomorrow for a new puzzle.
           </p>

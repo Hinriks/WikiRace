@@ -14,9 +14,6 @@ A prioritized list of things to build next, based on user feedback and planned f
 
 ## Medium priority
 
-- [ ] **Hard mode** — toggle that disables the back button, or adds a click/time limit
-- [ ] **Hints system** — reveal one step in a known solution path at +3 click penalty cost
-- [ ] **"How close were you?"** — on give up, reveal the shortest known path
 - [ ] **Leaderboard / high scores** — show top results per puzzle (ties into puzzle archive)
 - [ ] **Dark mode**
 
@@ -24,7 +21,7 @@ A prioritized list of things to build next, based on user feedback and planned f
 
 ## Growth / retention
 
-- [ ] **Twitter follow prompt on results screen** — add a small "Follow @WikiRaceDaily for the daily puzzle" line on the results screen, linking to the Twitter account. Turns players into followers, which compounds over time as the account grows.
+- [x] **Twitter follow prompt on results screen** — add a small "Follow @WikiRaceDaily for the daily puzzle" line on the results screen, linking to the Twitter account. Turns players into followers, which compounds over time as the account grows.
 
 ---
 
