@@ -77,7 +77,14 @@ export function ArticleView({ html, onNavigate, disabled }: Props) {
     // Tag internal wiki links as clickable, mark forbidden ones as inert
     container.querySelectorAll<HTMLAnchorElement>('a[href^="/wiki/"]').forEach(link => {
       const href = link.getAttribute('href') || '';
-      const raw = decodeURIComponent(href.replace('/wiki/', '')).replace(/_/g, ' ');
+      const path = href.replace('/wiki/', '');
+      let decoded: string;
+      try {
+        decoded = decodeURIComponent(path);
+      } catch {
+        decoded = path;
+      }
+      const raw = decoded.replace(/_/g, ' ');
 
       if (FORBIDDEN_PREFIXES.some(p => raw.startsWith(p))) {
         link.removeAttribute('href');
