@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python (puzzle generation scripts)
+__pycache__/
+*.pyc
