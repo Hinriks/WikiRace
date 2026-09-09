@@ -8,7 +8,7 @@ A prioritized list of things to build next, based on user feedback and planned f
 
 - [ ] **Community stats on result screen** — show average clicks and time for today's puzzle alongside personal stats. Data already exists in the Supabase `results` table, just needs to be queried and displayed. _(Feedback: "I don't know if I was good or bad at it")_
 - [ ] **Random challenge generator** — a one-click "Surprise me" button that picks two random articles and instantly generates a `?from=X&to=Y` challenge link, no manual input required. Add to the existing `CreateChallengeModal` as a secondary option — keep it tucked inside the modal, not on the home screen, so it serves power users who've already finished today's puzzle without pulling focus from the daily format. The daily puzzle remains the main game (shared, social, streak-building); the random generator is bonus content for engaged players who want more. _(Feedback: "An option to generate a random pair would be fun!")_
-- [ ] **Puzzle archive** — browse and replay past daily puzzles after they've passed. _(Feedback: "A homepage with a list of puzzles and high scores")_
+- [ ] **Puzzle archive / play previous days** — a dedicated archive screen listing all past daily puzzles. Players can browse by date and replay any previous puzzle, with their personal result shown if they've already played it. Requires fetching past rows from the `daily_puzzles` Supabase table ordered by date descending. Leaderboard per puzzle is a natural follow-on. _(Feedback: "A homepage with a list of puzzles and high scores")_
 
 ---
 
